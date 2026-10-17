@@ -39,7 +39,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n======================================================`);
-  console.log(`🚀 DigiSkills Hands-on Exercise No. 2 running locally:`);
+  console.log(`🚀 DigiSkills 3.0: Blog Dashboard running locally:`);
   console.log(`👉 http://localhost:${PORT}`);
   console.log(`======================================================\n`);
 });
