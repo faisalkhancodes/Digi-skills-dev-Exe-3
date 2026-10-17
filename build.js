@@ -3,13 +3,11 @@ const path = require('path');
 
 const distDir = path.join(__dirname, 'dist');
 
-// Ensure dist directory exists
 if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir, { recursive: true });
 }
 
-// Files to copy to dist for production deployment
-const filesToCopy = ['index.html', 'style.css'];
+const filesToCopy = ['index.html', 'App.css', 'style.css'];
 
 filesToCopy.forEach(file => {
   const src = path.join(__dirname, file);
@@ -20,4 +18,4 @@ filesToCopy.forEach(file => {
   }
 });
 
-console.log('\n✅ Build completed successfully! Production bundle ready in /dist');
+console.log('\n✅ Build completed! Production bundle ready in /dist');

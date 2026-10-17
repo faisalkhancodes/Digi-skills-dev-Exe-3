@@ -3,450 +3,542 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DigiSkills 3.0 Batch-04 - Full Stack Hands-on Exercise No. 2</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- React and Babel CDN for seamless client-side React execution -->
+  <title>DigiSkills 3.0 - Blog Dashboard with Redux Toolkit &amp; Performance Hooks</title>
+  <link rel="stylesheet" href="App.css" />
+  <!-- CDN Scripts for React 18, Redux Toolkit, React-Redux & Babel -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@reduxjs/toolkit@1.9.5/dist/redux-toolkit.umd.min.js"></script>
+  <script src="https://unpkg.com/react-redux@8.1.1/dist/react-redux.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
-  <div class="main-wrapper">
-    <!-- Header Banner -->
-    <header class="assignment-header">
-      <div>
-        <h1>DigiSkills 3.0 (Batch-04) Full Stack Development</h1>
-        <p>Hands-on Exercise No. 2: JavaScript Order Calculator &amp; ReactJS Product Catalog</p>
-      </div>
-      <div class="batch-badge">
-        <span>🎓 Student Submission Solution</span>
-      </div>
-    </header>
+  <div id="root"></div>
 
-    <!-- View Switcher Tabs -->
-    <nav class="tab-navigation">
-      <button class="tab-btn active" id="tab-all" onclick="switchView('all')">
-        📋 All Tasks (Combined View)
-      </button>
-      <button class="tab-btn" id="tab-task1" onclick="switchView('task1')">
-        ⚡ Task 1: JS Order Calculator
-      </button>
-      <button class="tab-btn" id="tab-task2" onclick="switchView('task2')">
-        ⚛️ Task 2: ReactJS Product Catalog
-      </button>
-    </nav>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useMemo, useCallback, memo } = React;
+    const { createSlice, configureStore, createAsyncThunk } = window.RTK;
+    const { Provider, useSelector, useDispatch } = window.ReactRedux;
 
-    <!-- ====================================================================
-         TASK 1: JAVASCRIPT PRODUCT ORDER CALCULATOR
-         ==================================================================== -->
-    <section class="task-section" id="section-task1">
-      <div class="section-title-bar">
-        <h2 class="section-title">
-          <span>Task 1: JavaScript Product Order Calculator</span>
-          <span class="badge-tag badge-js">Vanilla JS ES6+</span>
-        </h2>
-        <span style="font-size: 0.85rem; color: #64748b;">(Also check F12 DevTools Console)</span>
-      </div>
-
-      <div class="task1-grid">
-        <!-- Left: Product List & Controls -->
-        <div class="controls-card">
-          <h3>📦 Given Product Dataset</h3>
-          <table class="product-mini-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>Laptop</td>
-                <td>Electronics</td>
-                <td>Rs. 85,000</td>
-                <td><span class="stock-tag stock-in">5 in stock</span></td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Mouse</td>
-                <td>Accessories</td>
-                <td>Rs. 1,500</td>
-                <td><span class="stock-tag stock-out">0 (Out of stock)</span></td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>Keyboard</td>
-                <td>Accessories</td>
-                <td>Rs. 3,500</td>
-                <td><span class="stock-tag stock-in">10 in stock</span></td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>Monitor</td>
-                <td>Electronics</td>
-                <td>Rs. 25,000</td>
-                <td><span class="stock-tag stock-in">3 in stock</span></td>
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>USB Cable</td>
-                <td>Accessories</td>
-                <td>Rs. 700</td>
-                <td><span class="stock-tag stock-in">15 in stock</span></td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="action-buttons">
-            <button class="btn-action btn-primary" onclick="runFilterAvailable()">
-              🔍 1. Filter Available Products (Stock &gt; 0)
-            </button>
-            <button class="btn-action btn-secondary" onclick="runOrderWithDiscount()">
-              💰 2. Calculate Order with 10% Discount (&gt; Rs. 50,000)
-            </button>
-            <button class="btn-action btn-secondary" onclick="runOrderWithoutDiscount()">
-              🧾 3. Calculate Order without Discount (&le; Rs. 50,000)
-            </button>
-          </div>
-        </div>
-
-        <!-- Right: Interactive Console Output Terminal -->
-        <div class="terminal-card">
-          <div class="terminal-header">
-            <div class="terminal-dots">
-              <span class="dot dot-red"></span>
-              <span class="dot dot-yellow"></span>
-              <span class="dot dot-green"></span>
-            </div>
-            <span class="terminal-title">Terminal Console Output</span>
-            <button onclick="clearTerminal()" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:0.75rem;">Clear</button>
-          </div>
-          <div class="terminal-body" id="console-terminal">Click any button on the left to run Task 1 functions...</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ====================================================================
-         TASK 2: REACTJS PRODUCT CATALOG PAGE
-         ==================================================================== -->
-    <section class="task-section" id="section-task2">
-      <div class="section-title-bar">
-        <h2 class="section-title">
-          <span>Task 2: ReactJS Product Catalog Page</span>
-          <span class="badge-tag badge-react">React 18 + Hooks</span>
-        </h2>
-        <span style="font-size: 0.85rem; color: #64748b;">(Components &bull; Props &bull; useState &bull; Grid)</span>
-      </div>
-
-      <!-- React Mount Point -->
-      <div id="react-root"></div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer-info">
-      DigiSkills 3.0 Batch-04 Full Stack Web Development &bull; Hands-on Exercise No. 2 Solution
-    </footer>
-  </div>
-
-  <!-- ====================================================================
-       SCRIPT: TASK 1 JAVASCRIPT IMPLEMENTATION
-       ==================================================================== -->
-  <script>
-    // 1. Given Product Array
-    const products = [
-      { id: 1, name: "Laptop", category: "Electronics", price: 85000, stock: 5 },
-      { id: 2, name: "Mouse", category: "Accessories", price: 1500, stock: 0 },
-      { id: 3, name: "Keyboard", category: "Accessories", price: 3500, stock: 10 },
-      { id: 4, name: "Monitor", category: "Electronics", price: 25000, stock: 3 },
-      { id: 5, name: "USB Cable", category: "Accessories", price: 700, stock: 15 }
+    // ========================================================================
+    // 1. SAMPLE BLOG DATA
+    // ========================================================================
+    const initialBlogs = [
+      { id: 1, title: "Understanding React Hooks", category: "React", author: "Ali Khan", readingTime: 6, featured: true },
+      { id: 2, title: "Redux Toolkit Basics", category: "Redux", author: "Sara Ahmed", readingTime: 8, featured: false },
+      { id: 3, title: "Building Blog UI in React", category: "React", author: "Hamza Malik", readingTime: 5, featured: false },
+      { id: 4, title: "Node.js and Express Introduction", category: "Node", author: "Ayesha Noor", readingTime: 7, featured: true }
     ];
 
-    // Helper to log both to DevTools console and the on-screen terminal
-    const terminal = document.getElementById("console-terminal");
-    function logToTerminal(message) {
-      console.log(message);
-      terminal.textContent += message + "\n";
-      terminal.scrollTop = terminal.scrollHeight;
-    }
-
-    function clearTerminal() {
-      terminal.textContent = "";
-    }
-
-    /**
-     * Requirement 1: Filter and display only available products whose stock > 0
-     */
-    function getAvailableProducts(items) {
-      return items.filter(product => product.stock > 0);
-    }
-
-    function runFilterAvailable() {
-      clearTerminal();
-      logToTerminal("====================================================");
-      logToTerminal("          AVAILABLE PRODUCTS (STOCK > 0)            ");
-      logToTerminal("====================================================");
-      
-      const available = getAvailableProducts(products);
-      available.forEach((item, index) => {
-        logToTerminal(
-          `${index + 1}. ${item.name.padEnd(12)} | Category: ${item.category.padEnd(12)} | Price: Rs. ${item.price.toLocaleString().padStart(7)} | Stock: ${item.stock}`
-        );
-      });
-      
-      logToTerminal(`\nTotal Available Items: ${available.length} out of ${products.length}`);
-      logToTerminal("(Notice: 'Mouse' was filtered out because stock is 0)\n");
-    }
-
-    /**
-     * Requirement 2: Calculate subtotal, apply 10% discount if subtotal > 50,000, and compute final total
-     */
-    function calculateOrder(orderItems) {
-      const subtotal = orderItems.reduce((acc, item) => {
-        const qty = item.quantity || 1;
-        return acc + (item.price * qty);
-      }, 0);
-
-      const DISCOUNT_THRESHOLD = 50000;
-      const DISCOUNT_PERCENT = 10;
-      let discountAmount = 0;
-      let isDiscountApplied = false;
-
-      if (subtotal > DISCOUNT_THRESHOLD) {
-        discountAmount = (subtotal * DISCOUNT_PERCENT) / 100;
-        isDiscountApplied = true;
+    // ========================================================================
+    // 2. REDUX TOOLKIT SLICE & ASYNC THUNK
+    // ========================================================================
+    const fetchBlogs = createAsyncThunk(
+      "blogs/fetchBlogs",
+      async (_, { rejectWithValue }) => {
+        try {
+          // Simulate network latency (800ms)
+          await new Promise((resolve) => setTimeout(resolve, 800));
+          return initialBlogs;
+        } catch (err) {
+          return rejectWithValue("Failed to fetch blogs from simulated API.");
+        }
       }
+    );
 
-      const finalTotal = subtotal - discountAmount;
-
-      return {
-        items: orderItems,
-        subtotal: subtotal,
-        isDiscountApplied: isDiscountApplied,
-        discountRate: isDiscountApplied ? DISCOUNT_PERCENT : 0,
-        discountAmount: discountAmount,
-        finalTotal: finalTotal
-      };
-    }
-
-    /**
-     * Requirement 3: Print a clean, formatted invoice/order summary in the console
-     */
-    function printInvoice(orderSummary) {
-      const line = "-".repeat(52);
-      const doubleLine = "=".repeat(52);
-
-      logToTerminal(doubleLine);
-      logToTerminal("               DIGISKILLS TECH STORE                ");
-      logToTerminal("                CUSTOMER ORDER INVOICE              ");
-      logToTerminal(doubleLine);
-      logToTerminal(
-        "Item".padEnd(18) +
-        "Qty".padEnd(8) +
-        "Unit Price".padEnd(14) +
-        "Total (Rs.)".padStart(12)
-      );
-      logToTerminal(line);
-
-      orderSummary.items.forEach(item => {
-        const qty = item.quantity || 1;
-        const itemTotal = item.price * qty;
-        logToTerminal(
-          item.name.padEnd(18) +
-          String(qty).padEnd(8) +
-          `Rs. ${item.price.toLocaleString()}`.padEnd(14) +
-          `Rs. ${itemTotal.toLocaleString()}`.padStart(12)
-        );
-      });
-
-      logToTerminal(line);
-      logToTerminal(`Subtotal:`.padEnd(38) + `Rs. ${orderSummary.subtotal.toLocaleString()}`.padStart(14));
-
-      if (orderSummary.isDiscountApplied) {
-        logToTerminal(
-          `Discount (${orderSummary.discountRate}% on orders > Rs. 50k):`.padEnd(38) +
-          `- Rs. ${orderSummary.discountAmount.toLocaleString()}`.padStart(14)
-        );
-      } else {
-        logToTerminal(
-          `Discount (0% - Not eligible for > Rs. 50k):`.padEnd(38) +
-          `Rs. 0`.padStart(14)
-        );
+    const blogSlice = createSlice({
+      name: "blogs",
+      initialState: {
+        blogs: initialBlogs,
+        searchText: "",
+        selectedCategory: "All",
+        loading: false,
+        error: null
+      },
+      reducers: {
+        addBlog: (state, action) => {
+          const newId = state.blogs.length > 0 ? Math.max(...state.blogs.map(b => b.id)) + 1 : 1;
+          const newBlog = {
+            id: newId,
+            title: action.payload.title,
+            category: action.payload.category || "General",
+            author: action.payload.author || "Anonymous",
+            readingTime: Number(action.payload.readingTime) || 5,
+            featured: Boolean(action.payload.featured)
+          };
+          state.blogs.unshift(newBlog);
+        },
+        deleteBlog: (state, action) => {
+          state.blogs = state.blogs.filter((blog) => blog.id !== action.payload);
+        },
+        toggleFeatured: (state, action) => {
+          const blog = state.blogs.find((b) => b.id === action.payload);
+          if (blog) {
+            blog.featured = !blog.featured;
+          }
+        },
+        setSearchText: (state, action) => {
+          state.searchText = action.payload;
+        },
+        setSelectedCategory: (state, action) => {
+          state.selectedCategory = action.payload;
+        }
+      },
+      extraReducers: (builder) => {
+        builder
+          .addCase(fetchBlogs.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+          })
+          .addCase(fetchBlogs.fulfilled, (state, action) => {
+            state.loading = false;
+            state.blogs = action.payload;
+          })
+          .addCase(fetchBlogs.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload || "An unexpected error occurred.";
+          });
       }
-
-      logToTerminal(doubleLine);
-      logToTerminal(`FINAL TOTAL PAYABLE:`.padEnd(38) + `Rs. ${orderSummary.finalTotal.toLocaleString()}`.padStart(14));
-      logToTerminal(doubleLine);
-      logToTerminal("        Thank you for shopping with us!             \n");
-    }
-
-    function runOrderWithDiscount() {
-      clearTerminal();
-      logToTerminal(">>> SCENARIO A: Order > Rs. 50,000 (1x Laptop + 1x Monitor)");
-      const order = [
-        { name: "Laptop", price: 85000, quantity: 1 },
-        { name: "Monitor", price: 25000, quantity: 1 }
-      ];
-      const summary = calculateOrder(order);
-      printInvoice(summary);
-    }
-
-    function runOrderWithoutDiscount() {
-      clearTerminal();
-      logToTerminal(">>> SCENARIO B: Order <= Rs. 50,000 (1x Keyboard + 2x USB Cable)");
-      const order = [
-        { name: "Keyboard", price: 3500, quantity: 1 },
-        { name: "USB Cable", price: 700, quantity: 2 }
-      ];
-      const summary = calculateOrder(order);
-      printInvoice(summary);
-    }
-
-    // Auto run first filter on initial load
-    window.addEventListener("DOMContentLoaded", () => {
-      runFilterAvailable();
     });
 
-    // View tab switching function
-    function switchView(view) {
-      const sectionTask1 = document.getElementById("section-task1");
-      const sectionTask2 = document.getElementById("section-task2");
-      const tabAll = document.getElementById("tab-all");
-      const tabTask1 = document.getElementById("tab-task1");
-      const tabTask2 = document.getElementById("tab-task2");
+    const { addBlog, deleteBlog, toggleFeatured, setSearchText, setSelectedCategory } = blogSlice.actions;
 
-      tabAll.classList.remove("active");
-      tabTask1.classList.remove("active");
-      tabTask2.classList.remove("active");
-
-      if (view === "all") {
-        sectionTask1.style.display = "block";
-        sectionTask2.style.display = "block";
-        tabAll.classList.add("active");
-      } else if (view === "task1") {
-        sectionTask1.style.display = "block";
-        sectionTask2.style.display = "none";
-        tabTask1.classList.add("active");
-      } else if (view === "task2") {
-        sectionTask1.style.display = "none";
-        sectionTask2.style.display = "block";
-        tabTask2.classList.add("active");
+    // Redux Store
+    const store = configureStore({
+      reducer: {
+        blogs: blogSlice.reducer
       }
+    });
+
+    // ========================================================================
+    // 3. CUSTOM HOOK: useFilteredBlogs (with useMemo)
+    // ========================================================================
+    function useFilteredBlogs(blogs = [], searchText = "", selectedCategory = "All") {
+      return useMemo(() => {
+        if (!Array.isArray(blogs)) return [];
+        const query = searchText.trim().toLowerCase();
+
+        return blogs.filter((blog) => {
+          const matchesSearch =
+            !query ||
+            blog.title.toLowerCase().includes(query) ||
+            blog.author.toLowerCase().includes(query) ||
+            blog.category.toLowerCase().includes(query);
+
+          const matchesCategory =
+            selectedCategory === "All" ||
+            blog.category.toLowerCase() === selectedCategory.toLowerCase();
+
+          return matchesSearch && matchesCategory;
+        });
+      }, [blogs, searchText, selectedCategory]);
     }
-  </script>
 
-  <!-- ====================================================================
-       SCRIPT: TASK 2 REACTJS PRODUCT CATALOG COMPONENT
-       ==================================================================== -->
-  <script type="text/babel">
-    const { useState } = React;
+    // ========================================================================
+    // 4. REUSABLE COMPONENTS
+    // ========================================================================
 
-    // Given products dataset for the catalog (At least 4 items rendered via .map)
-    const initialProducts = [
-      { id: 1, name: "Laptop", category: "Electronics", price: 85000, stock: 5 },
-      { id: 2, name: "Mouse", category: "Accessories", price: 1500, stock: 0 },
-      { id: 3, name: "Keyboard", category: "Accessories", price: 3500, stock: 10 },
-      { id: 4, name: "Monitor", category: "Electronics", price: 25000, stock: 3 },
-      { id: 5, name: "USB Cable", category: "Accessories", price: 700, stock: 15 }
-    ];
+    // Header Component
+    function Header({ onFetchBlogs, loading }) {
+      return (
+        <header className="app-header">
+          <div className="header-brand">
+            <div className="brand-badge">⚡ DigiSkills 3.0 Full Stack</div>
+            <h1>Blog Dashboard</h1>
+            <p>React Hooks, Custom Hooks, Performance Optimization &amp; Redux Toolkit</p>
+          </div>
+          <div className="header-actions">
+            <button
+              className="btn-fetch"
+              onClick={onFetchBlogs}
+              disabled={loading}
+              title="Dispatch Redux createAsyncThunk to simulate API fetching"
+            >
+              {loading ? "⏳ Fetching Blogs..." : "🔄 Refresh via Async Thunk"}
+            </button>
+          </div>
+        </header>
+      );
+    }
 
-    /**
-     * Requirement 1 & 4: ProductCard Component
-     * Props: product (object), onAddToCart (function)
-     */
-    function ProductCard({ product, onAddToCart }) {
-      const isOutOfStock = product.stock === 0;
+    // BlogStats Component
+    function BlogStats({ blogs = [] }) {
+      const stats = useMemo(() => {
+        const total = blogs.length;
+        const featured = blogs.filter((b) => b.featured).length;
+        const totalReadingTime = blogs.reduce((sum, b) => sum + (Number(b.readingTime) || 0), 0);
+        const uniqueCategories = new Set(blogs.map((b) => b.category)).size;
+        return { total, featured, totalReadingTime, uniqueCategories };
+      }, [blogs]);
 
       return (
-        <div className={`product-card ${isOutOfStock ? "out-of-stock" : ""}`}>
-          <div>
-            <div className="product-top-row">
-              <span className="product-category-tag">{product.category}</span>
-              <span className={`product-stock-tag ${isOutOfStock ? "out-stock" : "in-stock"}`}>
-                {isOutOfStock ? "Out of Stock" : `In Stock (${product.stock})`}
-              </span>
-            </div>
-
-            <h4 className="product-name">{product.name}</h4>
-
-            <div className="product-price-box">
-              <span className="price-label">Price</span>
-              <span className="product-price">Rs. {product.price.toLocaleString()}</span>
+        <div className="stats-container">
+          <div className="stat-card">
+            <span className="stat-icon">📚</span>
+            <div>
+              <span className="stat-label">Total Blogs</span>
+              <h4 className="stat-value">{stats.total}</h4>
             </div>
           </div>
-
-          <button
-            className="btn-add-to-cart"
-            onClick={() => onAddToCart(product)}
-            disabled={isOutOfStock}
-          >
-            {isOutOfStock ? "⚠️ Out of Stock" : "🛒 Add to Cart"}
-          </button>
+          <div className="stat-card">
+            <span className="stat-icon">⭐</span>
+            <div>
+              <span className="stat-label">Featured Posts</span>
+              <h4 className="stat-value">{stats.featured}</h4>
+            </div>
+          </div>
+          <div className="stat-card">
+            <span className="stat-icon">⏱️</span>
+            <div>
+              <span className="stat-label">Total Reading Time</span>
+              <h4 className="stat-value">{stats.totalReadingTime} mins</h4>
+            </div>
+          </div>
+          <div className="stat-card">
+            <span className="stat-icon">🏷️</span>
+            <div>
+              <span className="stat-label">Categories</span>
+              <h4 className="stat-value">{stats.uniqueCategories}</h4>
+            </div>
+          </div>
         </div>
       );
     }
 
-    /**
-     * Requirement 2 & 3: Main ProductCatalog (App) Component
-     * Manages cartItems state, renders product cards in responsive grid using .map()
-     */
-    function ProductCatalog() {
-      // React useState to manage cart item count
-      const [cartCount, setCartCount] = useState(0);
+    // SearchBar Component with useRef focus
+    function SearchBar({ searchText, onSearchChange, selectedCategory, onCategoryChange, inputRef }) {
+      const categories = ["All", "React", "Redux", "Node"];
+      return (
+        <div className="searchbar-container">
+          <div className="search-input-wrapper">
+            <span className="search-icon">🔍</span>
+            <input
+              ref={inputRef}
+              type="text"
+              className="search-input"
+              placeholder="Search blogs by title, author, or category..."
+              value={searchText}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+            {searchText && (
+              <button
+                className="btn-clear-search"
+                onClick={() => onSearchChange("")}
+                title="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          <div className="category-filter-wrapper">
+            <label htmlFor="cat-select" className="filter-label">Category:</label>
+            <select
+              id="cat-select"
+              className="category-select"
+              value={selectedCategory}
+              onChange={(e) => onCategoryChange(e.target.value)}
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat === "All" ? "All Categories" : cat}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      );
+    }
 
-      // Handler to increase cart count
-      const handleAddToCart = (product) => {
-        if (product.stock > 0) {
-          setCartCount(prevCount => prevCount + 1);
+    // BlogCard Component wrapped with React.memo
+    const BlogCard = memo(function BlogCard({ blog, onToggleFeatured, onDeleteBlog }) {
+      console.log(`[Render] BlogCard #${blog.id}: "${blog.title}"`);
+
+      const getCategoryClass = (cat) => {
+        switch (cat.toLowerCase()) {
+          case "react": return "badge-react";
+          case "redux": return "badge-redux";
+          case "node": return "badge-node";
+          default: return "badge-default";
         }
       };
 
-      // Handler to reset cart count
-      const handleResetCart = () => {
-        setCartCount(0);
-      };
-
       return (
-        <div className="catalog-container">
-          {/* Catalog Top Navigation Bar with Cart Badge */}
-          <div className="catalog-nav">
-            <h3>🛍️ Product Catalog Showcase</h3>
+        <article className={`blog-card ${blog.featured ? "featured-card" : ""}`}>
+          <div className="card-top-meta">
+            <span className={`category-badge ${getCategoryClass(blog.category)}`}>
+              {blog.category}
+            </span>
+            {blog.featured && (
+              <span className="featured-badge">⭐ Featured</span>
+            )}
+          </div>
 
-            <div className="cart-widget">
-              <div className="cart-badge">
-                <span>🛒 Cart Items</span>
-                <span className="cart-counter">{cartCount}</span>
-              </div>
+          <h3 className="blog-title">{blog.title}</h3>
 
-              {cartCount > 0 && (
-                <button className="btn-reset-cart" onClick={handleResetCart}>
-                  Reset
-                </button>
-              )}
+          <div className="blog-info">
+            <div className="author-meta">
+              <span className="author-avatar">✍️</span>
+              <span className="author-name">{blog.author}</span>
+            </div>
+            <div className="reading-time">
+              <span>⏱️ {blog.readingTime} min read</span>
             </div>
           </div>
 
-          {/* Requirement 2: Responsive Grid Rendering Product Cards using .map() */}
-          <div className="products-grid">
-            {initialProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onAddToCart={handleAddToCart}
-              />
-            ))}
+          <div className="card-actions">
+            <button
+              className={`btn-feature-toggle ${blog.featured ? "is-featured" : ""}`}
+              onClick={() => onToggleFeatured(blog.id)}
+            >
+              {blog.featured ? "★ Unfeature" : "☆ Feature"}
+            </button>
+            <button
+              className="btn-delete"
+              onClick={() => onDeleteBlog(blog.id)}
+            >
+              🗑️ Delete
+            </button>
           </div>
+        </article>
+      );
+    });
+
+    // BlogList Component
+    function BlogList({ blogs, onToggleFeatured, onDeleteBlog }) {
+      if (!blogs || blogs.length === 0) {
+        return (
+          <div className="empty-state">
+            <div className="empty-icon">📭</div>
+            <h3>No Blogs Found</h3>
+            <p>No blog posts matched your search criteria or category filter.</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="blog-grid">
+          {blogs.map((blog) => (
+            <BlogCard
+              key={blog.id}
+              blog={blog}
+              onToggleFeatured={onToggleFeatured}
+              onDeleteBlog={onDeleteBlog}
+            />
+          ))}
         </div>
       );
     }
 
-    // Mount the React Application to #react-root
-    const rootElement = document.getElementById("react-root");
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(<ProductCatalog />);
+    // AddBlogForm Component
+    function AddBlogForm({ onAddBlog }) {
+      const [isOpen, setIsOpen] = useState(false);
+      const [title, setTitle] = useState("");
+      const [category, setCategory] = useState("React");
+      const [author, setAuthor] = useState("");
+      const [readingTime, setReadingTime] = useState(5);
+      const [featured, setFeatured] = useState(false);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!title.trim() || !author.trim()) return;
+
+        onAddBlog({
+          title: title.trim(),
+          category,
+          author: author.trim(),
+          readingTime: Number(readingTime) || 5,
+          featured
+        });
+
+        setTitle("");
+        setAuthor("");
+        setReadingTime(5);
+        setFeatured(false);
+        setIsOpen(false);
+      };
+
+      return (
+        <div className="add-blog-section">
+          {!isOpen ? (
+            <button className="btn-open-form" onClick={() => setIsOpen(true)}>
+              ➕ Add New Blog Post
+            </button>
+          ) : (
+            <form className="add-blog-form" onSubmit={handleSubmit}>
+              <div className="form-header">
+                <h3>Publish New Blog Post</h3>
+                <button type="button" className="btn-close-form" onClick={() => setIsOpen(false)}>✕</button>
+              </div>
+
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Blog Title *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Master CSS Grid"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Author Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Faisal Khan"
+                    value={author}
+                    onChange={(e) => setAuthor(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Category</label>
+                  <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                    <option value="React">React</option>
+                    <option value="Redux">Redux</option>
+                    <option value="Node">Node</option>
+                    <option value="General">General</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Reading Time (Mins)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="60"
+                    value={readingTime}
+                    onChange={(e) => setReadingTime(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="form-footer">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={featured}
+                    onChange={(e) => setFeatured(e.target.checked)}
+                  />
+                  <span>Mark as Featured Post ⭐</span>
+                </label>
+                <div className="form-buttons">
+                  <button type="button" className="btn-cancel" onClick={() => setIsOpen(false)}>Cancel</button>
+                  <button type="submit" className="btn-submit">✓ Add Blog</button>
+                </div>
+              </div>
+            </form>
+          )}
+        </div>
+      );
+    }
+
+    // ========================================================================
+    // 5. MAIN APP COMPONENT
+    // ========================================================================
+    function App() {
+      const dispatch = useDispatch();
+
+      // Read Redux state with useSelector
+      const { blogs, searchText, selectedCategory, loading, error } = useSelector(
+        (state) => state.blogs
+      );
+
+      // Performance: useRef to auto-focus search input on page load
+      const searchInputRef = useRef(null);
+
+      useEffect(() => {
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      }, []);
+
+      // Performance: useCallback for event handlers
+      const handleDeleteBlog = useCallback((id) => {
+        dispatch(deleteBlog(id));
+      }, [dispatch]);
+
+      const handleToggleFeatured = useCallback((id) => {
+        dispatch(toggleFeatured(id));
+      }, [dispatch]);
+
+      const handleSearchChange = useCallback((text) => {
+        dispatch(setSearchText(text));
+      }, [dispatch]);
+
+      const handleCategoryChange = useCallback((cat) => {
+        dispatch(setSelectedCategory(cat));
+      }, [dispatch]);
+
+      const handleAddBlog = useCallback((newBlog) => {
+        dispatch(addBlog(newBlog));
+      }, [dispatch]);
+
+      const handleRefresh = useCallback(() => {
+        dispatch(fetchBlogs());
+      }, [dispatch]);
+
+      // Custom Hook useFilteredBlogs (useMemo inside)
+      const filteredBlogs = useFilteredBlogs(blogs, searchText, selectedCategory);
+
+      return (
+        <div className="dashboard-container">
+          <Header onFetchBlogs={handleRefresh} loading={loading} />
+          <BlogStats blogs={blogs} />
+          <SearchBar
+            inputRef={searchInputRef}
+            searchText={searchText}
+            onSearchChange={handleSearchChange}
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+          />
+          <AddBlogForm onAddBlog={handleAddBlog} />
+
+          {loading && (
+            <div className="loading-banner">
+              <div className="spinner"></div>
+              <span>Fetching blogs via createAsyncThunk...</span>
+            </div>
+          )}
+
+          {error && (
+            <div className="error-banner">
+              <span>⚠️ {error}</span>
+              <button className="btn-retry" onClick={handleRefresh}>Retry</button>
+            </div>
+          )}
+
+          <div className="results-header">
+            <h2>
+              Articles <span className="results-badge">{filteredBlogs.length} of {blogs.length}</span>
+            </h2>
+            {(searchText || selectedCategory !== "All") && (
+              <span className="filter-summary">
+                Filtered by: {searchText && <strong>"{searchText}"</strong>}{" "}
+                {selectedCategory !== "All" && <span className="tag-indicator">Category: {selectedCategory}</span>}
+              </span>
+            )}
+          </div>
+
+          <BlogList
+            blogs={filteredBlogs}
+            onToggleFeatured={handleToggleFeatured}
+            onDeleteBlog={handleDeleteBlog}
+          />
+
+          <footer className="dashboard-footer">
+            <p>DigiSkills 3.0 &bull; Full Stack Web Development &bull; Blog Dashboard with Redux Toolkit</p>
+          </footer>
+        </div>
+      );
+    }
+
+    // Mount to DOM
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
   </script>
 </body>
 </html>
